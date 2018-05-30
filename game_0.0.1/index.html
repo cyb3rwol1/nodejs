@@ -1,0 +1,233 @@
+<!doctype html>
+<html>
+	<head>
+		<title>RPG - NodeJs</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+				
+		<style type="text/css">
+			.boxGeral{
+				width: 100%;
+				float: left;
+			}
+
+			.boxGame{
+				width:500px;
+				height:200px;
+				margin:20px auto;
+				background-color:#689F38;
+				color:#DCEDC8;
+				text-align: center;
+			}
+
+			.boxNovoJogador {
+				width:100%;
+				height:200px;
+				background-color:#689F38;
+				color:#DCEDC8;
+				text-align: center;
+			}
+
+			.titleBoxNovoJogador{
+				background-color: #795548;
+				width: 100%;
+				height: 50px; 
+				padding: 10px; 
+				text-align: center;
+			}
+
+
+			.boxInGame{
+				width:500px;
+				height:200px;
+				margin:20px auto;
+				background-color:#689F38;
+				color:#DCEDC8;
+				text-align: center;
+			}
+
+
+			.boxInGameEscolherChar{
+				width:500px;
+				height:200px;
+				margin:20px auto;
+				background-color:#689F38;
+				color:#DCEDC8;
+				text-align: center;
+			}
+
+			.titleBoxInGame{
+				background-color: #795548;
+				width: 100%;
+				height: 40px; 
+				padding: 5px; 
+				text-align: center;
+			}
+
+			.boxMensagens{
+				width:800px;
+				height:300px;
+				margin:5px auto;
+				background-color:#212121;
+				color:#DCEDC8;
+				text-align: center;
+			}
+
+			.inBoxMensagens{
+				background-color: #303F9F; 
+				width: 100%; 
+				height: 30px; 
+				padding: 5px; 
+				text-align: left; 
+				font-size: 12px;
+			}
+
+			.boxMensagensAppend{
+				width: 100%;
+				height: 250px;
+				padding: 5;
+				text-align: left;
+				font-size: 12px;
+				overflow-y: scroll;
+			}
+
+			#aboxMensagens { list-style-type: none; margin: 0; padding: 0; }
+			#aboxMensagens li { padding: 5px 5px; }
+		</style>
+
+		<script>
+
+			function hideChat(){
+				$('#botaoChat').hide();
+				$('#mensagemChat').hide();
+			}
+
+			function showChat(){
+				$('#botaoChat').show();
+				$('#mensagemChat').show();
+			}
+
+			function inGame(){
+				$('.boxNovoJogador').hide();
+			}
+
+			function offGame(){
+				$('.boxNovoJogador').show();
+			}
+
+			function inEscolherChar(){
+				$('.boxInGameEscolherChar').show();
+			}
+
+			function offEscolherChar(){
+				$('.boxInGameEscolherChar').hide();
+			}
+
+
+			$(function () {
+				
+				var socket = io();
+				hideChat();
+				offEscolherChar();
+
+				socket.on('startGame', function(data){
+					$('#boxGame').append(data.startGame);
+				});
+
+				socket.on('chat', function(data){
+					if(data.executa == 'A'){
+						$('#aboxMensagens').append($('<li>').text(data.dataStringB));
+						showChat();
+						offEscolherChar();
+					} else if (data.executa == 'B'){
+
+					} else if (data.executa == 'C'){
+						$('#boxMensagensAppend').append($('<li>').html(data.dataStringB));
+					} 
+				});
+
+				$('#botaoNovoJogador').on('click', function(){
+					nome = $('#nomeDoJogador').val();
+					if(!nome){
+						alert('Nome do jogador obrigatório!');
+						return ;
+					}
+
+					socket.emit('chat','A',nome);
+				});
+
+				$('#botaoChat').on('click', function(){
+					var msg = $('#mensagemChat').val();
+					var nome = $('#nomeDoJogador').val();
+					if(!msg)
+						return ;
+					socket.emit('chat','C',nome,msg);
+				});
+			});
+
+
+
+
+
+		</script>
+	<head>
+	<body>
+		<div class="boxGeral">
+
+			<div id="boxGame" class="boxGame">
+				
+			</div>
+
+
+<!--
+
+			<div class="boxNovoJogador">
+				<div class="inBoxNovoJogador">
+					<label><b>RPG - NodeJs</b></label>
+				</div>
+				
+				<input id="nomeDoJogador" style="margin-top: 20px;" autocomplete="off" required="true" />
+				<button id="botaoNovoJogador" type="button" style="margin-top: 20px;" class="btn btn-primary" >Entrar no game</button>
+			</div>
+
+
+
+
+			<div class="boxInGame">
+				<div class="titleBoxInGame">
+					<label><b></b></label>
+				</div>
+			</div>
+
+
+
+
+			<div class="boxInGameEscolherChar">
+				<div class="titleBoxInGame">
+					<label><b>Escolha seu char :</b></label>
+				</div>
+			</div>
+
+-->
+			<div id="boxMensagens" class="boxMensagens">
+				<div class="inBoxMensagens">
+					<label><b>ChatLog</b></label>
+					<input id="mensagemChat" style="margin-left: : 100px;" autocomplete="off" required="true" />
+					<button id="botaoChat" type="button" class="btn btn-dark" style="height: 20px; padding: 2px; font-size: 10px; text-align: center;" >Enviar</button>
+				</div>
+				<div id="boxMensagensAppend" class="boxMensagensAppend">
+					<ul id="aboxMensagens"></ul>
+				</div>
+				
+			</div>
+
+		</div>		
+	</body>
+</html>
