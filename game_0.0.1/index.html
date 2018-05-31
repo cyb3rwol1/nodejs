@@ -21,7 +21,8 @@
 			.boxGame{
 				width:500px;
 				height:200px;
-				margin:20px auto;
+				margin:0px auto;
+				margin-bottom: 20px;
 				background-color:#689F38;
 				color:#DCEDC8;
 				text-align: center;
@@ -95,11 +96,41 @@
 				padding: 5;
 				text-align: left;
 				font-size: 12px;
+				padding-left: 10px;
 				overflow-y: scroll;
 			}
 
 			#aboxMensagens { list-style-type: none; margin: 0; padding: 0; }
 			#aboxMensagens li { padding: 5px 5px; }
+
+			.boxConteudo{
+				width: 100%;
+				height: 100%;
+			}
+
+			.dadosUsuario{
+				width:500px;
+				height:20px;
+				margin:0px auto;
+				margin-top: 10px;
+				background-color:#212121;
+				color: white;
+				font-size: 11px;
+				font:verdana;
+				text-align: left;
+				padding: 2px 10px;
+			}
+
+			#boxMsg{
+				width:100%;
+				height:5px;
+				margin-top: 1px;
+				padding-left: 10px;
+				color: white;
+				font:verdana;
+				text-align: left;
+				padding: 2px 10px;
+			}
 		</style>
 
 		<script>
@@ -107,11 +138,13 @@
 			function hideChat(){
 				$('#botaoChat').hide();
 				$('#mensagemChat').hide();
+				$('#boxNovoJogador').show();
 			}
 
 			function showChat(){
 				$('#botaoChat').show();
 				$('#mensagemChat').show();
+				$('#boxNovoJogador').hide();
 			}
 
 			function inGame(){
@@ -122,108 +155,70 @@
 				$('.boxNovoJogador').show();
 			}
 
-			function inEscolherChar(){
-				$('.boxInGameEscolherChar').show();
-			}
-
-			function offEscolherChar(){
-				$('.boxInGameEscolherChar').hide();
-			}
-
-
 			$(function () {
 				
 				var socket = io();
 				hideChat();
-				offEscolherChar();
+				socket.emit('chat','Start');
 
-				socket.on('startGame', function(data){
-					$('#boxGame').append(data.startGame);
-				});
-
-				socket.on('chat', function(data){
-					if(data.executa == 'A'){
-						$('#aboxMensagens').append($('<li>').text(data.dataStringB));
-						showChat();
-						offEscolherChar();
-					} else if (data.executa == 'B'){
-
-					} else if (data.executa == 'C'){
-						$('#boxMensagensAppend').append($('<li>').html(data.dataStringB));
-					} 
-				});
-
-				$('#botaoNovoJogador').on('click', function(){
+				$(document.body).on('click','#botaoNovoJogador', function(event){
 					nome = $('#nomeDoJogador').val();
 					if(!nome){
 						alert('Nome do jogador obrigatório!');
 						return ;
 					}
 
-					socket.emit('chat','A',nome);
+					socket.emit('chat','novoPlayer',nome);
 				});
 
-				$('#botaoChat').on('click', function(){
+				$(document.body).on('click','#botaoChat', function(event){
 					var msg = $('#mensagemChat').val();
 					var nome = $('#nomeDoJogador').val();
 					if(!msg)
 						return ;
-					socket.emit('chat','C',nome,msg);
+					socket.emit('chat','C',msg);
+				});
+
+				socket.on('chat', function(data){
+
+					if(data.executa == 'novoPlayer'){
+						$('.dadosUsuario').append('<b>Usuário: </b>'+data.jogador.nome+' - <b>Status:</b> '+data.jogador.status);
+						$('.boxMensagensAppend').append($('<div class="boxMsg">').text(data.dataStringB));
+						$('.inBoxMensagens').append(data.tela);
+						showChat();
+					} else if (data.executa == 'B'){
+
+					} else if (data.executa == 'C'){
+						$('.boxMensagensAppend').append($('<div class="boxMsg">').text(data.dataStringB));
+					} 
 				});
 			});
-
-
-
-
-
 		</script>
 	<head>
 	<body>
 		<div class="boxGeral">
+			<div id="dadosUsuario" class="dadosUsuario" disabled="true" >
+				
+			</div>
 
 			<div id="boxGame" class="boxGame">
-				
-			</div>
-
-
-<!--
-
-			<div class="boxNovoJogador">
-				<div class="inBoxNovoJogador">
-					<label><b>RPG - NodeJs</b></label>
-				</div>
-				
-				<input id="nomeDoJogador" style="margin-top: 20px;" autocomplete="off" required="true" />
-				<button id="botaoNovoJogador" type="button" style="margin-top: 20px;" class="btn btn-primary" >Entrar no game</button>
-			</div>
-
-
-
-
-			<div class="boxInGame">
-				<div class="titleBoxInGame">
-					<label><b></b></label>
+				<div class="boxNovoJogador">
+					<div class="titleBoxNovoJogador"><label><b>RPG - NodeJs</b></label></div>
+					<div class="boxConteudo">
+						<input id="nomeDoJogador" style="margin: 20px auto;" autocomplete="off" required="true" />
+						<button id="botaoNovoJogador" type="button" style="margin: 20px auto;" class="btn btn-primary" >Entrar no game</button>
+					</div>
 				</div>
 			</div>
 
-
-
-
-			<div class="boxInGameEscolherChar">
-				<div class="titleBoxInGame">
-					<label><b>Escolha seu char :</b></label>
-				</div>
-			</div>
-
--->
 			<div id="boxMensagens" class="boxMensagens">
-				<div class="inBoxMensagens">
+				<div id="inBoxMensagens" class="inBoxMensagens">
 					<label><b>ChatLog</b></label>
 					<input id="mensagemChat" style="margin-left: : 100px;" autocomplete="off" required="true" />
 					<button id="botaoChat" type="button" class="btn btn-dark" style="height: 20px; padding: 2px; font-size: 10px; text-align: center;" >Enviar</button>
 				</div>
 				<div id="boxMensagensAppend" class="boxMensagensAppend">
-					<ul id="aboxMensagens"></ul>
+					
 				</div>
 				
 			</div>
