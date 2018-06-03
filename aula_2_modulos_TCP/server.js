@@ -14,6 +14,6 @@ net.createServer(function(connection){
 	connection.on('data',function(mensagem){
 		trocaMensagem(mensagem);
 	});
-}).listen(3000,function(){
-	console.log('Conectado Port:3000');
+}).listen('localhost:3000',function(){
+	console.log('Servidor criado em  localhost:3000');
 });
