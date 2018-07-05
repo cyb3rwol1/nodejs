@@ -13,4 +13,3 @@ process.stdin.on('readable',function(){
 		return;
 	client.write(message.toString().replace('/\n/',''));
 })
-
