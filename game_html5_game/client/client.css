@@ -1,0 +1,30 @@
+
+body {
+    margin: 0 auto;
+    padding: 0;
+    background: #000;
+}
+
+.geral {
+    width: 100%;
+    min-width: 600px;
+    height: 600px;
+    background: black;
+    padding: 0px;
+}
+
+.principal {
+    width: 70%;
+    min-width: 600px;
+    height: 500px;
+    background-color: #2196F3;
+    margin: 15px auto;
+}
+
+.divLoginPrincipal {
+    width: 70%;
+    height: 300px;
+    background-color: #689F38;
+    margin: 15px auto;
+}
+
